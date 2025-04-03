@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Laundry Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link href="../css/styles.css" rel="stylesheet">
+  <style>
+    .sidebar {
+      background-color: #212529;
+      color: white;
+      min-height: 100vh;
+      padding-top: 20px;
+    }
+    .sidebar-logo {
+      text-align: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #444;
+    }
+    .sidebar-logo h4 {
+      color: white;
+      margin-top: 10px;
+      font-size: 18px;
+    }
+    .nav-link {
+      color: rgba(255,255,255,.75);
+      padding: 12px 20px;
+      margin: 2px 0;
+    }
+    .nav-link:hover {
+      color: white;
+      background-color: rgba(255,255,255,.1);
+    }
+    .nav-link.active {
+      color: white;
+      background-color: #0d6efd;
+    }
+    .nav-link i {
+      margin-right: 10px;
+    }
+    .content {
+      padding: 20px;
+    }
+    .top-bar {
+      background-color: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .user-dropdown {
+      display: flex;
+      align-items: center;
+    }
+    .user-name {
+      margin-right: 10px;
+    }
+    .dashboard-card {
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .dashboard-card .card-header {
+      padding: 15px 20px;
+    }
+    .dashboard-card .card-body {
+      padding: 20px;
+    }
+    .stat-card {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-right: 15px;
+    }
+    .bg-primary-light {
+      background-color: #e6f0ff;
+      color: #0d6efd;
+    }
+    .bg-success-light {
+      background-color: #e6f6e9;
+      color: #28a745;
+    }
+    .bg-warning-light {
+      background-color: #fff8e6;
+      color: #fd7e14;
+    }
+    .bg-info-light {
+      background-color: #e6f8fa;
+      color: #17a2b8;
+    }
+    .stat-info h4 {
+      font-size: 22px;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .stat-info p {
+      margin-bottom: 0;
+      color: #6c757d;
+    }
+    .feature-card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: all 0.3s;
+      cursor: pointer;
+      text-align: center;
+      padding: 25px 15px;
+      margin-bottom: 20px;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .feature-icon {
+      font-size: 30px;
+      margin-bottom: 15px;
+      color: #0d6efd;
+    }
+    .table th {
+      white-space: nowrap;
+    }
+    #tabContent > div {
+      display: none;
+    }
+    #tabContent > div.active {
+      display: block;
+    }
+    
+    /* Status tracker styles */
+    .status-tracker {
+      height: 50px;
+      margin: 20px 0 10px;
+    }
+    .status-step {
+      width: 30px;
+      height: 30px;
+      background-color: #e9ecef;
+      color: #6c757d;
+      font-weight: bold;
+      z-index: 2;
+    }
+    .status-step.completed {
+      background-color: #28a745;
+      color: white;
+    }
+    .status-step.active {
+      background-color: #0d6efd;
+      color: white;
+      transform: scale(1.2);
+      box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+    }
+    .status-line {
+      height: 4px;
+      background-color: #e9ecef;
+      width: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+    .status-labels {
+      width: 100%;
+      font-size: 0.75rem;
+      color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-2 p-0 sidebar">
+        <div class="sidebar-logo">
+          <h4>Laundry Management</h4>
+        </div>
+        <ul class="nav flex-column" id="sidebarNav">
+          <li class="nav-item">
+            <a class="nav-link active" href="#dashboard" data-bs-toggle="tab">
+              <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#orders" data-bs-toggle="tab">
+              <i class="bi bi-basket"></i> Orders
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#users" data-bs-toggle="tab">
+              <i class="bi bi-people"></i> Users
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#services" data-bs-toggle="tab">
+              <i class="bi bi-tags"></i> Services
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#reports" data-bs-toggle="tab">
+              <i class="bi bi-bar-chart"></i> Reports
+            </a>
+          </li>
+          <li class="nav-item mt-4">
+            <a class="nav-link" href="javascript:void(0)" onclick="logout()">
+              <i class="bi bi-box-arrow-left"></i> Logout
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="col-md-10 content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+          <h2 class="h4 mb-0">Admin Dashboard</h2>
+          <div class="user-dropdown">
+            <span class="user-name" id="userEmail">admin@laundry.com</span>
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#">Profile</a></li>
+              <li><a class="dropdown-item" href="#">Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="javascript:void(0)" onclick="logout()">Logout</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Content Area -->
+        <div class="tab-content" id="tabContent">
+          <!-- Dashboard Tab -->
+          <div class="tab-pane active" id="dashboard">
+            <div class="row">
+              <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                  <div class="stat-icon bg-primary-light">
+                    <i class="bi bi-basket"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h4 id="totalOrders">0</h4>
+                    <p>Total Orders</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                  <div class="stat-icon bg-success-light">
+                    <i class="bi bi-check-circle"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h4 id="completedOrders">0</h4>
+                    <p>Completed</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                  <div class="stat-icon bg-warning-light">
+                    <i class="bi bi-hourglass-split"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h4 id="pendingOrders">0</h4>
+                    <p>Pending</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                  <div class="stat-icon bg-info-light">
+                    <i class="bi bi-currency-dollar"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h4 id="monthlyRevenue">$0</h4>
+                    <p>Monthly Revenue</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-lg-8">
+                <div class="dashboard-card">
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Recent Orders</h5>
+                    <a href="#orders" class="btn btn-sm btn-outline-primary" data-bs-toggle="tab">View All</a>
+                  </div>
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Service</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                          </tr>
+                        </thead>
+                        <tbody id="recentOrdersTable">
+                          <!-- Recent orders will be loaded here -->
+                          <tr>
+                            <td colspan="6" class="text-center">Loading orders...</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="dashboard-card">
+                  <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Actions</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-6">
+                        <div class="feature-card" onclick="window.location.href='#orders'">
+                          <div class="feature-icon">
+                            <i class="bi bi-plus-circle"></i>
+                          </div>
+                          <h6>New Order</h6>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="feature-card" onclick="window.location.href='#users'">
+                          <div class="feature-icon">
+                            <i class="bi bi-person-plus"></i>
+                          </div>
+                          <h6>Add User</h6>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="feature-card" onclick="window.location.href='#services'">
+                          <div class="feature-icon">
+                            <i class="bi bi-tag"></i>
+                          </div>
+                          <h6>Add Service</h6>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="feature-card" onclick="window.location.href='#reports'">
+                          <div class="feature-icon">
+                            <i class="bi bi-bar-chart"></i>
+                          </div>
+                          <h6>Reports</h6>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="dashboard-card">
+                  <div class="card-header">
+                    <h5 class="card-title mb-0">Service Stats</h5>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="serviceChart" height="200"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Orders Tab -->
+          <div class="tab-pane" id="orders">
+            <div class="dashboard-card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Laundry Orders</h5>
+                <button class="btn btn-primary btn-sm" onclick="openNewOrderModal()">
+                  <i class="bi bi-plus"></i> New Order
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="mb-3 d-flex justify-content-between align-items-center">
+                  <div class="d-flex">
+                    <select class="form-select me-2" id="statusFilter" style="width: auto;">
+                      <option value="">All Statuses</option>
+                      <option value="PENDING">Pending</option>
+                      <option value="CONFIRMED">Confirmed</option>
+                      <option value="PICKED_UP">Picked Up</option>
+                      <option value="PROCESSING">Processing</option>
+                      <option value="CLEANED">Cleaned</option>
+                      <option value="FOLDED">Folded</option>
+                      <option value="PACKAGED">Packaged</option>
+                      <option value="READY_FOR_DELIVERY">Ready for Delivery</option>
+                      <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
+                      <option value="DELIVERED">Delivered</option>
+                      <option value="CANCELLED">Cancelled</option>
+                    </select>
+                    <select class="form-select" id="serviceFilter" style="width: auto;">
+                      <option value="">All Services</option>
+                      <!-- Service options will be loaded dynamically -->
+                    </select>
+                  </div>
+                  <div class="input-group" style="width: 250px;">
+                    <input type="text" class="form-control" placeholder="Search..." id="orderSearch">
+                    <button class="btn btn-outline-secondary" type="button">
+                      <i class="bi bi-search"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Service</th>
+                        <th>Items</th>
+                        <th>Weight</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="ordersTable">
+                      <!-- Orders will be loaded here -->
+                      <tr>
+                        <td colspan="10" class="text-center">Loading orders...</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <span id="ordersTotal">0</span> orders found
+                    </div>
+                    <nav>
+                      <ul class="pagination">
+                        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Users Tab -->
+          <div class="tab-pane" id="users">
+            <div class="dashboard-card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">User Management</h5>
+                <button class="btn btn-primary btn-sm" onclick="openNewUserModal()">
+                  <i class="bi bi-plus"></i> New User
+                </button>
+              </div>
+              <div class="card-body">
+                <ul class="nav nav-tabs mb-3">
+                  <li class="nav-item">
+                    <a class="nav-link active" href="#allUsers" data-bs-toggle="tab">All Users</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#customers" data-bs-toggle="tab">Customers</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#staffMembers" data-bs-toggle="tab">Staff</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#admins" data-bs-toggle="tab">Admins</a>
+                  </li>
+                </ul>
+                <div class="tab-content">
+                  <div class="tab-pane active" id="allUsers">
+                    <div class="table-responsive">
+                      <table class="table table-striped table-hover">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Registered</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody id="usersTable">
+                          <!-- Users will be loaded here -->
+                          <tr>
+                            <td colspan="8" class="text-center">Loading users...</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <!-- Other user tabs content would go here -->
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Services Tab -->
+          <div class="tab-pane" id="services">
+            <div class="dashboard-card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Service Categories</h5>
+                <button class="btn btn-primary btn-sm" onclick="openNewServiceModal()">
+                  <i class="bi bi-plus"></i> New Service
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Base Price</th>
+                        <th>Price per KG</th>
+                        <th>Est. Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="servicesTable">
+                      <!-- Services will be loaded here -->
+                      <tr>
+                        <td colspan="8" class="text-center">Loading services...</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Reports Tab -->
+          <div class="tab-pane" id="reports">
+            <div class="dashboard-card">
+              <div class="card-header">
+                <h5 class="card-title mb-0">Reports & Analytics</h5>
+              </div>
+              <div class="card-body">
+                <div class="row mb-4">
+                  <div class="col-md-3">
+                    <div class="card">
+                      <div class="card-body text-center p-4">
+                        <i class="bi bi-cash-stack text-success fs-1 mb-3"></i>
+                        <h5>Revenue Report</h5>
+                        <p class="text-muted">View revenue statistics and trends</p>
+                        <button class="btn btn-outline-success btn-sm">Generate</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="card">
+                      <div class="card-body text-center p-4">
+                        <i class="bi bi-people text-primary fs-1 mb-3"></i>
+                        <h5>Staff Productivity</h5>
+                        <p class="text-muted">Analyze staff performance metrics</p>
+                        <button class="btn btn-outline-primary btn-sm">Generate</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="card">
+                      <div class="card-body text-center p-4">
+                        <i class="bi bi-tags text-info fs-1 mb-3"></i>
+                        <h5>Service Analysis</h5>
+                        <p class="text-muted">Review service usage statistics</p>
+                        <button class="btn btn-outline-info btn-sm">Generate</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="card">
+                      <div class="card-body text-center p-4">
+                        <i class="bi bi-star text-warning fs-1 mb-3"></i>
+                        <h5>Customer Feedback</h5>
+                        <p class="text-muted">See ratings and review analytics</p>
+                        <button class="btn btn-outline-warning btn-sm">Generate</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="dashboard-card">
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Revenue Overview</h5>
+                    <div class="input-group" style="width: 200px;">
+                      <select class="form-select" id="reportPeriod">
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                        <option value="quarter">This Quarter</option>
+                        <option value="year">This Year</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="revenueChart" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Edit Order Modal -->
+  <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editOrderModalLabel">Edit Order</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editOrderForm">
+            <input type="hidden" id="editOrderId">
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="editCustomerName" class="form-label">Customer Name</label>
+                <input type="text" class="form-control" id="editCustomerName" required>
+              </div>
+              <div class="col-md-6">
+                <label for="editCustomerPhone" class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="editCustomerPhone" required>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="editServiceType" class="form-label">Service Type</label>
+                <select class="form-select" id="editServiceType" required>
+                  <option value="">Select Service...</option>
+                  <option value="1">Wash & Fold</option>
+                  <option value="2">Dry Cleaning</option>
+                  <option value="3">Wash & Iron</option>
+                  <option value="4">Premium Care</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="editOrderStatus" class="form-label">Status</label>
+                <select class="form-select" id="editOrderStatus" required>
+                  <option value="PENDING">Pending</option>
+                  <option value="CONFIRMED">Confirmed</option>
+                  <option value="PICKED_UP">Picked Up</option>
+                  <option value="PROCESSING">Processing</option>
+                  <option value="CLEANED">Cleaned</option>
+                  <option value="FOLDED">Folded</option>
+                  <option value="PACKAGED">Packaged</option>
+                  <option value="READY_FOR_DELIVERY">Ready for Delivery</option>
+                  <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
+                  <option value="DELIVERED">Delivered</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label for="editItemCount" class="form-label">Number of Items</label>
+                <input type="number" class="form-control" id="editItemCount" min="1" required>
+              </div>
+              <div class="col-md-4">
+                <label for="editWeight" class="form-label">Weight (kg)</label>
+                <input type="number" class="form-control" id="editWeight" min="0.1" step="0.1" required>
+              </div>
+              <div class="col-md-4">
+                <label for="editPrice" class="form-label">Price</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control" id="editPrice" min="0" step="0.01" required>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="editNotes" class="form-label">Special Instructions</label>
+              <textarea class="form-control" id="editNotes" rows="3"></textarea>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="editPickupDate" class="form-label">Pickup Date</label>
+                <input type="datetime-local" class="form-control" id="editPickupDate">
+              </div>
+              <div class="col-md-6">
+                <label for="editDeliveryDate" class="form-label">Estimated Delivery Date</label>
+                <input type="datetime-local" class="form-control" id="editDeliveryDate">
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="editAddress" class="form-label">Delivery Address</label>
+              <textarea class="form-control" id="editAddress" rows="2"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveOrderBtn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Update Status Modal -->
+  <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="updateStatusModalLabel">Update Order Status</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="updateStatusForm">
+            <input type="hidden" id="statusOrderId">
+            
+            <div class="mb-3">
+              <p><strong>Order #</strong>: <span id="statusOrderNumber"></span></p>
+              <p><strong>Customer</strong>: <span id="statusCustomerName"></span></p>
+              <p><strong>Current Status</strong>: <span id="statusCurrentBadge"></span></p>
+            </div>
+            
+            <div class="mb-3">
+              <h6 class="fw-bold">Suggested Status Flow</h6>
+              <div class="status-tracker d-flex justify-content-between align-items-center position-relative">
+                <div class="status-step rounded-circle d-flex justify-content-center align-items-center" data-status="PENDING">
+                  <span class="status-number">1</span>
+                </div>
+                <div class="status-step rounded-circle d-flex justify-content-center align-items-center" data-status="PICKED_UP">
+                  <span class="status-number">2</span>
+                </div>
+                <div class="status-step rounded-circle d-flex justify-content-center align-items-center" data-status="PROCESSING">
+                  <span class="status-number">3</span>
+                </div>
+                <div class="status-step rounded-circle d-flex justify-content-center align-items-center" data-status="READY_FOR_DELIVERY">
+                  <span class="status-number">4</span>
+                </div>
+                <div class="status-step rounded-circle d-flex justify-content-center align-items-center" data-status="DELIVERED">
+                  <span class="status-number">5</span>
+                </div>
+                <div class="status-line position-absolute"></div>
+              </div>
+              <div class="status-labels d-flex justify-content-between mt-1">
+                <small>Pending</small>
+                <small>Picked Up</small>
+                <small>Processing</small>
+                <small>Ready</small>
+                <small>Delivered</small>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="newOrderStatus" class="form-label">New Status</label>
+              <select class="form-select" id="newOrderStatus" required>
+                <option value="PENDING">Pending</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="PICKED_UP">Picked Up</option>
+                <option value="PROCESSING">Processing</option>
+                <option value="CLEANED">Cleaned</option>
+                <option value="FOLDED">Folded</option>
+                <option value="PACKAGED">Packaged</option>
+                <option value="READY_FOR_DELIVERY">Ready for Delivery</option>
+                <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
+                <option value="DELIVERED">Delivered</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label for="statusNotes" class="form-label">Notes</label>
+              <textarea class="form-control" id="statusNotes" rows="3" placeholder="Enter any notes about this status change..."></textarea>
+            </div>
+            
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="notifyCustomer">
+              <label class="form-check-label" for="notifyCustomer">
+                Notify customer about this status change
+              </label>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveStatusBtn">Update Status</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Load Chart.js for visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Check if user is logged in and has admin role
+    document.addEventListener('DOMContentLoaded', function() {
+      const userRole = sessionStorage.getItem('userRole');
+      const userEmail = sessionStorage.getItem('userEmail');
+      
+      // For development/testing purposes
+      if (!userRole) {
+        console.log("No user role found, setting test role");
+        sessionStorage.setItem('userRole', 'ADMIN');
+        sessionStorage.setItem('userEmail', 'admin@laundry.com');
+      }
+      
+      if ((!userRole || userRole !== 'ADMIN') && window.location.pathname.includes('/admin/')) {
+        // Redirect to login if not admin
+        console.log("Unauthorized access attempt, redirecting to login");
+        window.location.href = '../login.html';
+        return;
+      }
+      
+      if (userEmail) {
+        document.getElementById('userEmail').textContent = userEmail;
+      }
+      
+      // Set up tab navigation
+      setupTabNavigation();
+      
+      // Load dashboard data
+      loadDashboardData();
+      
+      // Initialize charts
+      initCharts();
+      
+      // Pre-initialize Bootstrap modals
+      const editOrderModal = new bootstrap.Modal(document.getElementById('editOrderModal'), {
+        backdrop: 'static',
+        keyboard: false
+      });
+      
+      const updateStatusModal = new bootstrap.Modal(document.getElementById('updateStatusModal'), {
+        backdrop: 'static',
+        keyboard: false
+      });
+      
+      console.log("Application initialized successfully");
+    });
+    
+    function logout() {
+      sessionStorage.removeItem('userRole');
+      sessionStorage.removeItem('userEmail');
+      window.location.href = '../login.html';
+    }
+    
+    function setupTabNavigation() {
+      // Handle sidebar navigation
+      const navLinks = document.querySelectorAll('#sidebarNav .nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          // Remove active class from all links
+          navLinks.forEach(l => l.classList.remove('active'));
+          
+          // Add active class to clicked link
+          this.classList.add('active');
+          
+          // Show the corresponding tab
+          const targetId = this.getAttribute('href').substring(1);
+          document.querySelectorAll('#tabContent > div').forEach(tab => {
+            tab.classList.remove('active');
+          });
+          document.getElementById(targetId).classList.add('active');
+          
+          // Load data for the tab if needed
+          if (targetId === 'orders') {
+            loadOrders();
+          } else if (targetId === 'users') {
+            loadUsers();
+          } else if (targetId === 'services') {
+            loadServices();
+          }
+        });
+      });
+    }
+    
+    // Mock data store for demonstration purposes
+    const mockOrders = {
+      1042: { 
+        id: 1042, 
+        customer: 'John Doe', 
+        phone: '123-456-7890', 
+        service: 'Wash & Fold', 
+        serviceId: 1,
+        items: 5, 
+        weight: 3.2, 
+        price: 24.50, 
+        status: 'DELIVERED', 
+        created: '2025-04-02 09:15',
+        pickup: '2025-04-02T09:15',
+        delivery: '2025-04-04T14:00',
+        address: '123 Main St, Apt 4B\nCity, State 12345',
+        notes: 'Handle with care, includes delicate items.'
+      },
+      1041: { 
+        id: 1041, 
+        customer: 'Jane Smith', 
+        phone: '234-567-8901', 
+        service: 'Dry Cleaning', 
+        serviceId: 2,
+        items: 3, 
+        weight: 2.0, 
+        price: 35.00, 
+        status: 'PROCESSING', 
+        created: '2025-04-01 16:22',
+        pickup: '2025-04-01T16:22',
+        delivery: '2025-04-03T17:00',
+        address: '456 Oak Ave\nCity, State 12345',
+        notes: 'Please remove stain on the blue shirt collar.'
+      },
+      1040: { 
+        id: 1040, 
+        customer: 'Mike Johnson', 
+        phone: '345-678-9012', 
+        service: 'Wash & Iron', 
+        serviceId: 3,
+        items: 8, 
+        weight: 4.5, 
+        price: 18.75, 
+        status: 'PICKED_UP', 
+        created: '2025-04-01 14:10',
+        pickup: '2025-04-01T14:10',
+        delivery: '2025-04-03T16:00',
+        address: '789 Pine St\nCity, State 12345',
+        notes: ''
+      },
+      1039: { 
+        id: 1039, 
+        customer: 'Sarah Williams', 
+        phone: '456-789-0123', 
+        service: 'Premium Care', 
+        serviceId: 4,
+        items: 2, 
+        weight: 1.0, 
+        price: 42.00, 
+        status: 'PENDING', 
+        created: '2025-04-01 11:45',
+        pickup: '2025-04-01T11:45',
+        delivery: '2025-04-04T15:00',
+        address: '101 Cedar Rd\nCity, State 12345',
+        notes: 'Customer prefers delivery in the afternoon.'
+      },
+      1038: { 
+        id: 1038, 
+        customer: 'David Brown', 
+        phone: '567-890-1234', 
+        service: 'Wash & Fold', 
+        serviceId: 1,
+        items: 6, 
+        weight: 3.5, 
+        price: 21.25, 
+        status: 'READY_FOR_DELIVERY', 
+        created: '2025-03-31 15:30',
+        pickup: '2025-03-31T15:30',
+        delivery: '2025-04-02T16:30',
+        address: '202 Maple Ln\nCity, State 12345',
+        notes: ''
+      }
+    };
+    
+    // Function to load dashboard data from our mock data
+    function loadDashboardData() {
+      // Simulating API call
+      setTimeout(() => {
+        // Get orders from mock data
+        const orders = Object.values(mockOrders);
+        
+        // Calculate stats
+        const totalOrders = orders.length;
+        const completedOrders = orders.filter(order => order.status === 'DELIVERED').length;
+        const pendingOrders = orders.filter(order => order.status === 'PENDING' || order.status === 'CONFIRMED').length;
+        
+        // Calculate revenue
+        const totalRevenue = orders.reduce((sum, order) => sum + order.price, 0);
+        
+        // Display stats
+        document.getElementById('totalOrders').textContent = totalOrders;
+        document.getElementById('completedOrders').textContent = completedOrders;
+        document.getElementById('pendingOrders').textContent = pendingOrders;
+        document.getElementById('monthlyRevenue').textContent = '$' + totalRevenue.toFixed(2);
+        
+        // Sort orders by date (newest first) and get the most recent 5
+        const recentOrders = [...orders].sort((a, b) => 
+          new Date(b.created) - new Date(a.created)
+        ).slice(0, 5);
+        
+        let html = '';
+        recentOrders.forEach(order => {
+          let statusClass = '';
+          switch (order.status) {
+            case 'PENDING': statusClass = 'bg-warning'; break;
+            case 'PROCESSING': statusClass = 'bg-info'; break;
+            case 'PICKED_UP': statusClass = 'bg-primary'; break;
+            case 'READY_FOR_DELIVERY': statusClass = 'bg-info'; break;
+            case 'DELIVERED': statusClass = 'bg-success'; break;
+            default: statusClass = 'bg-secondary';
+          }
+          
+          html += `
+            <tr>
+              <td>${order.id}</td>
+              <td>${order.customer}</td>
+              <td>${order.service}</td>
+              <td>$${order.price.toFixed(2)}</td>
+              <td><span class="badge ${statusClass}">${order.status}</span></td>
+              <td>${order.created}</td>
+            </tr>
+          `;
+        });
+        
+        document.getElementById('recentOrdersTable').innerHTML = html;
+      }, 300);
+    }
+    
+    // Function to load orders from our mock data
+    function loadOrders() {
+      // Would be replaced with actual API call in a real app
+      document.getElementById('ordersTable').innerHTML = '<tr><td colspan="10" class="text-center">Loading orders...</td></tr>';
+      
+      // Simulating API call
+      setTimeout(() => {
+        // Use mock data from our mockOrders object
+        const orders = Object.values(mockOrders);
+        
+        let html = '';
+        orders.forEach(order => {
+          let statusClass = '';
+          switch (order.status) {
+            case 'PENDING': statusClass = 'bg-warning'; break;
+            case 'PROCESSING': statusClass = 'bg-info'; break;
+            case 'PICKED_UP': statusClass = 'bg-primary'; break;
+            case 'READY_FOR_DELIVERY': statusClass = 'bg-info'; break;
+            case 'DELIVERED': statusClass = 'bg-success'; break;
+            case 'CANCELLED': statusClass = 'bg-danger'; break;
+            default: statusClass = 'bg-secondary';
+          }
+          
+          html += `
+            <tr>
+              <td>${order.id}</td>
+              <td>${order.customer}</td>
+              <td>${order.phone}</td>
+              <td>${order.service}</td>
+              <td>${order.items}</td>
+              <td>${order.weight} kg</td>
+              <td>$${order.price.toFixed(2)}</td>
+              <td><span class="badge ${statusClass}">${order.status}</span></td>
+              <td>${order.created}</td>
+              <td>
+                <button class="btn btn-sm btn-primary" onclick="editOrder(${order.id})"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-info" onclick="updateOrderStatus(${order.id})"><i class="bi bi-arrow-up-circle"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="deleteOrder(${order.id})"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        });
+        
+        document.getElementById('ordersTable').innerHTML = html;
+        document.getElementById('ordersTotal').textContent = orders.length;
+        
+        // Load services for filter
+        const services = [
+          { id: 1, name: 'Wash & Fold' },
+          { id: 2, name: 'Dry Cleaning' },
+          { id: 3, name: 'Wash & Iron' },
+          { id: 4, name: 'Premium Care' }
+        ];
+        
+        let serviceOptions = '<option value="">All Services</option>';
+        services.forEach(service => {
+          serviceOptions += `<option value="${service.id}">${service.name}</option>`;
+        });
+        
+        document.getElementById('serviceFilter').innerHTML = serviceOptions;
+      }, 300);
+    }
+    
+    // Mock function to load users - in a real app, this would fetch from the API
+    function loadUsers() {
+      // Would be replaced with actual API call
+      document.getElementById('usersTable').innerHTML = '<tr><td colspan="8" class="text-center">Loading users...</td></tr>';
+      
+      // Simulating API call
+      setTimeout(() => {
+        // Users data - in a real app would come from API
+        const users = [
+          { id: 1, name: 'Admin User', email: 'admin@laundry.com', phone: '123-456-7890', role: 'ADMIN', status: 'Active', registered: '2024-01-15' },
+          { id: 2, name: 'Staff One', email: 'staff1@laundry.com', phone: '234-567-8901', role: 'STAFF', status: 'Active', registered: '2024-01-20' },
+          { id: 3, name: 'Staff Two', email: 'staff2@laundry.com', phone: '345-678-9012', role: 'STAFF', status: 'Active', registered: '2024-01-25' },
+          { id: 4, name: 'John Doe', email: 'john@example.com', phone: '456-789-0123', role: 'CUSTOMER', status: 'Active', registered: '2024-02-01' },
+          { id: 5, name: 'Jane Smith', email: 'jane@example.com', phone: '567-890-1234', role: 'CUSTOMER', status: 'Active', registered: '2024-02-05' },
+          { id: 6, name: 'Mike Johnson', email: 'mike@example.com', phone: '678-901-2345', role: 'CUSTOMER', status: 'Inactive', registered: '2024-02-10' }
+        ];
+        
+        let html = '';
+        users.forEach(user => {
+          let roleClass = '';
+          switch (user.role) {
+            case 'ADMIN': roleClass = 'bg-danger'; break;
+            case 'STAFF': roleClass = 'bg-primary'; break;
+            case 'CUSTOMER': roleClass = 'bg-success'; break;
+            default: roleClass = 'bg-secondary';
+          }
+          
+          let statusBadge = user.status === 'Active' ? 
+            '<span class="badge bg-success">Active</span>' : 
+            '<span class="badge bg-secondary">Inactive</span>';
+          
+          html += `
+            <tr>
+              <td>${user.id}</td>
+              <td>${user.name}</td>
+              <td>${user.email}</td>
+              <td>${user.phone}</td>
+              <td><span class="badge ${roleClass}">${user.role}</span></td>
+              <td>${statusBadge}</td>
+              <td>${user.registered}</td>
+              <td>
+                <button class="btn btn-sm btn-primary" onclick="editUser(${user.id})"><i class="bi bi-pencil"></i></button>
+                ${user.status === 'Active' ? 
+                  `<button class="btn btn-sm btn-warning" onclick="deactivateUser(${user.id})"><i class="bi bi-person-x"></i></button>` : 
+                  `<button class="btn btn-sm btn-success" onclick="activateUser(${user.id})"><i class="bi bi-person-check"></i></button>`
+                }
+                <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        });
+        
+        document.getElementById('usersTable').innerHTML = html;
+      }, 500);
+    }
+    
+    // Mock function to load services - in a real app, this would fetch from the API
+    function loadServices() {
+      // Would be replaced with actual API call
+      document.getElementById('servicesTable').innerHTML = '<tr><td colspan="8" class="text-center">Loading services...</td></tr>';
+      
+      // Simulating API call
+      setTimeout(() => {
+        // Services data - in a real app would come from API
+        const services = [
+          { id: 1, name: 'Wash & Fold', description: 'Standard washing and folding service', basePrice: '$10.00', pricePerKg: '$2.50', estTime: '24 hours', status: 'Active' },
+          { id: 2, name: 'Dry Cleaning', description: 'Professional dry cleaning for delicate items', basePrice: '$15.00', pricePerKg: '$5.00', estTime: '48 hours', status: 'Active' },
+          { id: 3, name: 'Wash & Iron', description: 'Washing with professional ironing service', basePrice: '$12.50', pricePerKg: '$3.50', estTime: '36 hours', status: 'Active' },
+          { id: 4, name: 'Premium Care', description: 'Premium service with specialized treatment for luxury items', basePrice: '$25.00', pricePerKg: '$7.50', estTime: '72 hours', status: 'Active' },
+          { id: 5, name: 'Express Service', description: 'Same day turnaround for urgent orders', basePrice: '$20.00', pricePerKg: '$6.00', estTime: '8 hours', status: 'Inactive' }
+        ];
+        
+        let html = '';
+        services.forEach(service => {
+          let statusBadge = service.status === 'Active' ? 
+            '<span class="badge bg-success">Active</span>' : 
+            '<span class="badge bg-secondary">Inactive</span>';
+          
+          html += `
+            <tr>
+              <td>${service.id}</td>
+              <td>${service.name}</td>
+              <td>${service.description}</td>
+              <td>${service.basePrice}</td>
+              <td>${service.pricePerKg}</td>
+              <td>${service.estTime}</td>
+              <td>${statusBadge}</td>
+              <td>
+                <button class="btn btn-sm btn-primary" onclick="editService(${service.id})"><i class="bi bi-pencil"></i></button>
+                ${service.status === 'Active' ? 
+                  `<button class="btn btn-sm btn-warning" onclick="deactivateService(${service.id})"><i class="bi bi-toggle-off"></i></button>` : 
+                  `<button class="btn btn-sm btn-success" onclick="activateService(${service.id})"><i class="bi bi-toggle-on"></i></button>`
+                }
+                <button class="btn btn-sm btn-danger" onclick="deleteService(${service.id})"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        });
+        
+        document.getElementById('servicesTable').innerHTML = html;
+      }, 500);
+    }
+    
+    // Initialize charts for the dashboard
+    function initCharts() {
+      // Service distribution chart
+      const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+      new Chart(serviceCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Wash & Fold', 'Dry Cleaning', 'Wash & Iron', 'Premium Care'],
+          datasets: [{
+            data: [45, 25, 20, 10],
+            backgroundColor: ['#0d6efd', '#fd7e14', '#20c997', '#6f42c1'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+      
+      // Revenue chart
+      const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+      new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+          datasets: [{
+            label: 'Revenue',
+            data: [820, 1150, 750, 1300],
+            borderColor: '#0d6efd',
+            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return '$' + value;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // Function for opening the new order modal
+    function openNewOrderModal() {
+      alert("New Order Modal would open here");
+    }
+    
+    // Function to format date for datetime-local input
+    function formatDateForInput(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toISOString().slice(0, 16); // Format as "YYYY-MM-DDTHH:MM"
+    }
+    
+    // Function for opening and populating the edit order modal
+    function editOrder(id) {
+      // Get order data from mock data store
+      const order = mockOrders[id];
+      if (!order) {
+        alert(`Order with ID ${id} not found.`);
+        return;
+      }
+      
+      // Populate the form fields
+      document.getElementById('editOrderId').value = order.id;
+      document.getElementById('editCustomerName').value = order.customer;
+      document.getElementById('editCustomerPhone').value = order.phone;
+      document.getElementById('editServiceType').value = order.serviceId;
+      document.getElementById('editOrderStatus').value = order.status;
+      document.getElementById('editItemCount').value = order.items;
+      document.getElementById('editWeight').value = order.weight;
+      document.getElementById('editPrice').value = order.price;
+      document.getElementById('editNotes').value = order.notes;
+      document.getElementById('editPickupDate').value = formatDateForInput(order.pickup);
+      document.getElementById('editDeliveryDate').value = formatDateForInput(order.delivery);
+      document.getElementById('editAddress').value = order.address;
+      
+      // Set up save button handler
+      document.getElementById('saveOrderBtn').onclick = saveOrder;
+      
+      // Show the modal
+      const editOrderModal = new bootstrap.Modal(document.getElementById('editOrderModal'));
+      editOrderModal.show();
+    }
+    
+    // Function to save the edited order
+    function saveOrder() {
+      const id = document.getElementById('editOrderId').value;
+      
+      // Get values from form
+      const customerName = document.getElementById('editCustomerName').value;
+      const customerPhone = document.getElementById('editCustomerPhone').value;
+      const serviceId = document.getElementById('editServiceType').value;
+      const serviceName = document.getElementById('editServiceType').options[document.getElementById('editServiceType').selectedIndex].text;
+      const status = document.getElementById('editOrderStatus').value;
+      const items = document.getElementById('editItemCount').value;
+      const weight = document.getElementById('editWeight').value;
+      const price = document.getElementById('editPrice').value;
+      const notes = document.getElementById('editNotes').value;
+      const pickup = document.getElementById('editPickupDate').value;
+      const delivery = document.getElementById('editDeliveryDate').value;
+      const address = document.getElementById('editAddress').value;
+      
+      // Validate required fields
+      if (!customerName || !customerPhone || !serviceId || !status || !items || !weight || !price) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+      
+      // In a real application, you would send this data to the server via API
+      // For this demo, we'll update our mock data
+      mockOrders[id] = {
+        ...mockOrders[id],
+        customer: customerName,
+        phone: customerPhone,
+        service: serviceName,
+        serviceId: parseInt(serviceId),
+        status: status,
+        items: parseInt(items),
+        weight: parseFloat(weight),
+        price: parseFloat(price),
+        notes: notes,
+        pickup: pickup,
+        delivery: delivery,
+        address: address
+      };
+      
+      // Close the modal
+      const editOrderModal = bootstrap.Modal.getInstance(document.getElementById('editOrderModal'));
+      editOrderModal.hide();
+      
+      // Refresh the orders table if we're on the orders tab
+      if (document.getElementById('orders').classList.contains('active')) {
+        loadOrders();
+      }
+      
+      // If we're on the dashboard, refresh the recent orders section
+      if (document.getElementById('dashboard').classList.contains('active')) {
+        loadDashboardData();
+      }
+      
+      // Show success message
+      alert(`Order #${id} has been updated successfully.`);
+    }
+    
+    function updateOrderStatus(id) {
+      // Get order data from mock data store
+      const order = mockOrders[id];
+      if (!order) {
+        alert(`Order with ID ${id} not found.`);
+        return;
+      }
+      
+      // Populate the modal with order details
+      document.getElementById('statusOrderId').value = order.id;
+      document.getElementById('statusOrderNumber').textContent = order.id;
+      document.getElementById('statusCustomerName').textContent = order.customer;
+      
+      // Set the current status badge with appropriate color
+      let statusClass = '';
+      switch (order.status) {
+        case 'PENDING': statusClass = 'bg-warning'; break;
+        case 'PROCESSING': statusClass = 'bg-info'; break;
+        case 'PICKED_UP': statusClass = 'bg-primary'; break;
+        case 'READY_FOR_DELIVERY': statusClass = 'bg-info'; break;
+        case 'DELIVERED': statusClass = 'bg-success'; break;
+        case 'CANCELLED': statusClass = 'bg-danger'; break;
+        default: statusClass = 'bg-secondary';
+      }
+      
+      document.getElementById('statusCurrentBadge').innerHTML = `<span class="badge ${statusClass}">${order.status}</span>`;
+      
+      // Set the current status as default in the dropdown
+      document.getElementById('newOrderStatus').value = order.status;
+      
+      // Update the status flow indicator
+      updateStatusFlowIndicator(order.status);
+      
+      // Set up the save button handler
+      document.getElementById('saveStatusBtn').onclick = saveOrderStatus;
+      
+      // Setup the status change handler
+      const statusDropdown = document.getElementById('newOrderStatus');
+      if (statusDropdown) {
+        // Remove previous handler if exists (using a direct function assignment approach instead)
+        statusDropdown.onchange = function() {
+          console.log("Status changed to:", this.value);
+          updateStatusFlowIndicator(this.value);
+        };
+      } else {
+        console.error("Status dropdown element not found");
+      }
+      
+      // Show the modal
+      try {
+        // Try to get existing modal instance
+        let modalElement = document.getElementById('updateStatusModal');
+        let updateStatusModal = bootstrap.Modal.getInstance(modalElement);
+        
+        if (!updateStatusModal) {
+          // If no instance exists, create one
+          updateStatusModal = new bootstrap.Modal(modalElement, {
+            backdrop: 'static',
+            keyboard: false
+          });
+        }
+        
+        updateStatusModal.show();
+        console.log("Modal shown successfully");
+      } catch (error) {
+        console.error("Error showing modal:", error);
+        // Fallback for older Bootstrap versions
+        $('#updateStatusModal').modal('show');
+      }
+    }
+    
+    // Function to save the updated order status
+    function saveOrderStatus() {
+      try {
+        console.log("Saving order status...");
+        
+        const id = document.getElementById('statusOrderId').value;
+        console.log("Order ID:", id);
+        
+        if (!id || !mockOrders[id]) {
+          console.error("Invalid order ID or order not found:", id);
+          alert("Error: Order not found");
+          return;
+        }
+        
+        const newStatus = document.getElementById('newOrderStatus').value;
+        const notes = document.getElementById('statusNotes').value;
+        const notifyCustomer = document.getElementById('notifyCustomer').checked;
+        
+        console.log("New Status:", newStatus);
+        console.log("Notes:", notes);
+        console.log("Notify Customer:", notifyCustomer);
+        
+        const oldStatus = mockOrders[id].status;
+        
+        // In a real application, you would send this data to the server via API
+        // For this demo, we'll update our mock data
+        mockOrders[id] = {
+          ...mockOrders[id],
+          status: newStatus
+        };
+        
+        // If there are notes, append them to the existing notes
+        if (notes) {
+          const existingNotes = mockOrders[id].notes ? mockOrders[id].notes + '\n\n' : '';
+          mockOrders[id].notes = existingNotes + `Status Update [${new Date().toLocaleString()}]: ${notes}`;
+        }
+        
+        // In a real app, we would handle customer notification here
+        if (notifyCustomer) {
+          console.log(`Notification would be sent to customer: ${mockOrders[id].customer} about order #${id} status change to ${newStatus}`);
+          // Show toast notification
+          const toastHTML = `
+            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+              <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-success text-white">
+                  <strong class="me-auto">Customer Notified</strong>
+                  <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                  Customer ${mockOrders[id].customer} has been notified about the status change.
+                </div>
+              </div>
+            </div>
+          `;
+          
+          // Add toast to the DOM
+          const toastContainer = document.createElement('div');
+          toastContainer.innerHTML = toastHTML;
+          document.body.appendChild(toastContainer);
+          
+          // Remove toast after 3 seconds
+          setTimeout(() => {
+            if (document.body.contains(toastContainer)) {
+              document.body.removeChild(toastContainer);
+            }
+          }, 3000);
+        }
+        
+        console.log("Updated mockOrders:", mockOrders[id]);
+        
+        // Close the modal
+        try {
+          const updateStatusModal = bootstrap.Modal.getInstance(document.getElementById('updateStatusModal'));
+          if (updateStatusModal) {
+            updateStatusModal.hide();
+          } else {
+            console.warn("Modal instance not found, trying jQuery method");
+            // For older Bootstrap versions, try jQuery method
+            $('#updateStatusModal').modal('hide');
+          }
+        } catch (modalError) {
+          console.error("Error closing modal:", modalError);
+          // Fallback: try to remove modal classes manually
+          const modalElement = document.getElementById('updateStatusModal');
+          if (modalElement) {
+            modalElement.classList.remove('show');
+            modalElement.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.parentNode.removeChild(backdrop);
+          }
+        }
+        
+        // Refresh the orders table if we're on the orders tab
+        if (document.getElementById('orders').classList.contains('active')) {
+          loadOrders();
+        }
+        
+        // If we're on the dashboard, refresh the recent orders section
+        if (document.getElementById('dashboard').classList.contains('active')) {
+          loadDashboardData();
+        }
+        
+        // Show success message
+        alert(`Order #${id} status has been updated from ${oldStatus} to ${newStatus}.`);
+        
+      } catch (error) {
+        console.error("Error saving order status:", error);
+        alert("An error occurred while updating the order status. Please try again.");
+      }
+    }
+    
+    function deleteOrder(id) {
+      if (confirm(`Are you sure you want to delete Order #${id}? This action cannot be undone.`)) {
+        // In a real app, you would send a delete request to the API
+        // For this demo, we'll just show a confirmation
+        alert(`Order #${id} has been deleted successfully.`);
+        
+        // Refresh the orders table
+        if (document.getElementById('orders').classList.contains('active')) {
+          loadOrders();
+        }
+      }
+    }
+    
+    function openNewUserModal() {
+      alert("New User Modal would open here");
+    }
+    
+    function editUser(id) {
+      alert(`Edit User Modal for ID: ${id} would open here`);
+    }
+    
+    function activateUser(id) {
+      alert(`Activate User ID: ${id}`);
+    }
+    
+    function deactivateUser(id) {
+      alert(`Deactivate User ID: ${id}`);
+    }
+    
+    function deleteUser(id) {
+      alert(`Delete confirmation for User ID: ${id} would show here`);
+    }
+    
+    function openNewServiceModal() {
+      alert("New Service Modal would open here");
+    }
+    
+    function editService(id) {
+      alert(`Edit Service Modal for ID: ${id} would open here`);
+    }
+    
+    function activateService(id) {
+      alert(`Activate Service ID: ${id}`);
+    }
+    
+    function deactivateService(id) {
+      alert(`Deactivate Service ID: ${id}`);
+    }
+    
+    function deleteService(id) {
+      alert(`Delete confirmation for Service ID: ${id} would show here`);
+    }
+    
+    // Helper function to update the status flow indicator
+    function updateStatusFlowIndicator(currentStatus) {
+      console.log("Updating status flow for:", currentStatus);
+      
+      try {
+        // Clear all status classes first
+        const statusSteps = document.querySelectorAll('#updateStatusModal .status-step');
+        console.log("Found status steps:", statusSteps.length);
+        
+        statusSteps.forEach(step => {
+          step.classList.remove('completed', 'active');
+        });
+        
+        // Define the order of statuses in our flow
+        const statusFlow = ['PENDING', 'PICKED_UP', 'PROCESSING', 'READY_FOR_DELIVERY', 'DELIVERED'];
+        
+        // Find the index of the current status in our flow
+        const currentIndex = statusFlow.indexOf(currentStatus);
+        console.log("Current status index:", currentIndex);
+        
+        if (currentIndex === -1) {
+          // If the status is not in our main flow (like CANCELLED), don't highlight any step
+          console.log("Status not in main flow");
+          return;
+        }
+        
+        // Mark completed steps
+        for (let i = 0; i < statusSteps.length; i++) {
+          const step = statusSteps[i];
+          if (i < currentIndex) {
+            step.classList.add('completed');
+          } else if (i === currentIndex) {
+            step.classList.add('active');
+          }
+        }
+        
+        // Update the status line to show progress
+        const statusLine = document.querySelector('#updateStatusModal .status-line');
+        if (!statusLine) {
+          console.error("Status line element not found");
+          return;
+        }
+        
+        // Calculate progress percentage based on the current step
+        let progressPercentage = 0;
+        if (statusFlow.length > 1) {
+          progressPercentage = (currentIndex / (statusFlow.length - 1)) * 100;
+        }
+        
+        console.log("Progress percentage:", progressPercentage);
+        
+        // Update the status line with a gradient
+        statusLine.style.background = 
+          `linear-gradient(to right, #28a745 ${progressPercentage}%, #e9ecef ${progressPercentage}%)`;
+      } catch (error) {
+        console.error("Error updating status flow indicator:", error);
+      }
+    }
+  </script>
+</body>
+</html>

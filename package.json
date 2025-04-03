@@ -1,0 +1,26 @@
+{
+  "name": "laundry-management-system",
+  "version": "1.0.0",
+  "description": "Spring Boot Laundry Management System",
+  "main": "index.js",
+  "scripts": {
+    "test": "mvn test",
+    "build": "mvn clean package -DskipTests",
+    "start": "mvn spring-boot:run",
+    "docker:build": "docker build -t laundry-management-system:latest .",
+    "docker:start": "docker-compose up -d",
+    "docker:stop": "docker-compose down"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhishekbvs/Laundry-Management-System.git"
+  },
+  "keywords": ["laundry", "spring-boot", "management-system", "docker"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/abhishekbvs/Laundry-Management-System/issues"
+  },
+  "homepage": "https://github.com/abhishekbvs/Laundry-Management-System#readme"
+}
