@@ -1,6 +1,5 @@
-<<<<<<< HEAD
 # LaundaryManagementSystem
-=======
+
 # Laundry Management System
 
 A comprehensive Spring Boot application for managing laundry services with multi-role access, scheduling, and reporting capabilities. The system allows tracking of laundry orders, customer information, staff assignments, pickups, deliveries, and generates analytics reports.
